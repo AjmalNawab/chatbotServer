@@ -100,12 +100,12 @@ const io = new Server(server, {
     origin: "*",
   },
 });
-
+// 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
 // OpenRouter settings
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const HEADERS = {
-  Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-  "HTTP-Referer": "https://sales-chatbot.netlify.app/", // Update to your frontend domain in production
+  Authorization: `Bearer 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`,
+  Referer: "https://sales-chatbot.netlify.app/", // your frontend domain
   "Content-Type": "application/json",
 };
 
