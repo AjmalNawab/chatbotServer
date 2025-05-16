@@ -82,26 +82,28 @@
 // server.listen(3001, () => {
 //   console.log("🚀 Server running on port 3001");
 // });
-// server.js
+// server.// Import necessary modules
 import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 import dotenv from "dotenv";
 import axios from "axios";
 
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
-// Express and Socket.IO setup
+// Initialize Express and HTTP server
 const app = express();
 const server = http.createServer(app);
+
+// Initialize Socket.IO server with CORS enabled
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*", // Allow all origins (adjust as needed)
   },
 });
-// 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
-// OpenRouter settings
+
+// OpenRouter API configuration
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const HEADERS = {
   Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -109,25 +111,30 @@ const HEADERS = {
   "Content-Type": "application/json",
 };
 
-// Handle socket connections
+// Handle new socket connection
 io.on("connection", (socket) => {
   console.log("✅ A user connected");
+  console.log(`🔗 User connected with socket ID: ${socket.id}`); // Unique session per user
 
+  // Send welcome message
   socket.emit("receive_message", {
     text: "Hello! How can I help you today?",
     sender: "bot",
     timestamp: new Date().toISOString(),
   });
 
+  // Log typing status
   socket.on("typing_status", (message) => {
     if (message) {
       console.log("✍️ User is typing:", message);
     }
   });
 
+  // Handle simple user message
   socket.on("send_message", async (msg) => {
     console.log("📩 Message received:", msg);
 
+    // Emit user message to frontend
     socket.emit("receive_message", {
       text: msg,
       sender: "user",
@@ -176,6 +183,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle messages expecting step-by-step replies
   socket.on("send_message_with_steps", async (msg) => {
     console.log("📩 Message received with steps:", msg);
 
@@ -217,17 +225,18 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle user disconnect
   socket.on("disconnect", () => {
-    console.log("❌ User disconnected");
+    console.log(`❌ User disconnected: ${socket.id}`);
   });
 });
 
-// Test route
+// Basic test route
 app.get("/", (req, res) => {
   res.send("Chat Server is running");
 });
 
-// Start server
+// Start the server
 server.listen(3001, () => {
   console.log("🚀 Server running on port 3001");
 });
